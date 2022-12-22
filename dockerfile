@@ -1,11 +1,11 @@
 FROM ubuntu:20.04
 
-MAINTAINER yuzheng14
+LABEL maintainer=yuzheng14
 
 # 使用 bash 来执行命令
 SHELL ["/bin/bash","-c"]
 
-WORKDIR root
+WORKDIR /root/code
 
 # 替换 apt 源
 RUN sed -i "s@http://.*archive.ubuntu.com@http://mirrors.tuna.tsinghua.edu.cn@g" /etc/apt/sources.list && \
@@ -42,41 +42,42 @@ RUN git config --global alias.cam "commit -a -m";\
 RUN apt install -y zsh curl wget && \
   wget https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh && \
   echo -e "y\n" | sh install.sh && \
-  rm -f install.sh
+  rm -f install.sh && \
+  usermod -s /bin/zsh root
 
 # 安装 nvm && node，写入钩子自动检测 .nvmrc 进行 node 版本切换
 # 设定默认的 node 版本
 RUN wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.2/install.sh | bash && \
   echo $'export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"\n\
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm' >> ~/.zshrc && \
+  [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm' >> ~/.zshrc && \
   source ~/.zshrc && \
   nvm install 16.19.0
 RUN echo $'\n\
-# place this after nvm initialization!\n\
-autoload -U add-zsh-hook\n\
-load-nvmrc() {\n\
+  # place this after nvm initialization!\n\
+  autoload -U add-zsh-hook\n\
+  load-nvmrc() {\n\
   local nvmrc_path="$(nvm_find_nvmrc)"\n\
-\n\
+  \n\
   if [ -n "$nvmrc_path" ]; then\n\
-    local nvmrc_node_version=$(nvm version "$(cat "${nvmrc_path}")")\n\
-\n\
-    if [ "$nvmrc_node_version" = "N/A" ]; then\n\
-      nvm install\n\
-    elif [ "$nvmrc_node_version" != "$(nvm version)" ]; then\n\
-      nvm use\n\
-    fi\n\
-  elif [ -n "$(PWD=$OLDPWD nvm_find_nvmrc)" ] && [ "$(nvm version)" != "$(nvm version default)" ]; then\n\
-    echo "Reverting to nvm default version"\n\
-    nvm use default\n\
+  local nvmrc_node_version=$(nvm version "$(cat "${nvmrc_path}")")\n\
+  \n\
+  if [ "$nvmrc_node_version" = "N/A" ]; then\n\
+  nvm install\n\
+  elif [ "$nvmrc_node_version" != "$(nvm version)" ]; then\n\
+  nvm use\n\
   fi\n\
-}\n\
-add-zsh-hook chpwd load-nvmrc\n\
-load-nvmrc\n\
-' >> ~/.zshrc && \
+  elif [ -n "$(PWD=$OLDPWD nvm_find_nvmrc)" ] && [ "$(nvm version)" != "$(nvm version default)" ]; then\n\
+  echo "Reverting to nvm default version"\n\
+  nvm use default\n\
+  fi\n\
+  }\n\
+  add-zsh-hook chpwd load-nvmrc\n\
+  load-nvmrc\n\
+  ' >> ~/.zshrc && \
   source ~/.zshrc
 
 # 安装 nrm，添加公司内网 npm 私服地址，设定默认地址为淘宝镜像源
-ENV PATH="/root/.nvm/versions/node/v16.19.0/bin":$PATH
+ENV PATH=/root/.nvm/versions/node/v16.19.0/bin:$PATH
 RUN npm install -g nrm --registry=https://registry.npmmirror.com/ && \
   nrm use taobao
 
