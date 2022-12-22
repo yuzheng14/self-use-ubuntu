@@ -50,7 +50,7 @@ RUN wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.2/install.sh | 
   echo $'export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"\n\
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm' >> ~/.zshrc && \
   source ~/.zshrc && \
-  nvm install 18.12.1
+  nvm install 16.19.0
 RUN echo $'\n\
 # place this after nvm initialization!\n\
 autoload -U add-zsh-hook\n\
@@ -76,7 +76,7 @@ load-nvmrc\n\
   source ~/.zshrc
 
 # 安装 nrm，添加公司内网 npm 私服地址，设定默认地址为淘宝镜像源
-ENV PATH="/root/.nvm/versions/node/v18.12.1/bin":$PATH
+ENV PATH="/root/.nvm/versions/node/v16.19.0/bin":$PATH
 RUN npm install -g nrm --registry=https://registry.npmmirror.com/ && \
   nrm use taobao
 
