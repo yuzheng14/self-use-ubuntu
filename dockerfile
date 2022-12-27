@@ -31,12 +31,18 @@ RUN echo "export LC_ALL=zh_CN.UTF-8" >> /etc/profile && \
 # 安装 git
 RUN apt install -y git
 
+# 配置 git 使用的指令
+ARG git_username=''
+ARG git_email=''
+
 # 配置 git alias
 RUN git config --global alias.cam "commit -a -m";\
   git config --global alias.cm "commit -m";\
   git config --global alias.pure "pull --rebase";\
   git config --global alias.lg "log --graph --decorate";\
-  git config --global alias.lg1 "log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%Creset' --abbrev-commit --date=relative"
+  git config --global alias.lg1 "log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%Creset' --abbrev-commit --date=relative";\
+  git config --global user.name ${git_username};\
+  git config --global user.email ${git_email}
 
 # 安装 zsh && oh-my-zsh
 RUN apt install -y zsh curl wget && \
@@ -76,7 +82,7 @@ RUN echo $'\n\
   ' >> ~/.zshrc && \
   source ~/.zshrc
 
-# 安装 nrm，添加公司内网 npm 私服地址，设定默认地址为淘宝镜像源
+# 安装 nrm，设定默认地址为淘宝镜像源
 ENV PATH=/root/.nvm/versions/node/v16.19.0/bin:$PATH
 RUN npm install -g nrm --registry=https://registry.npmmirror.com/ && \
   nrm use taobao
