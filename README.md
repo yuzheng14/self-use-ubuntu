@@ -2,6 +2,11 @@
 
 个人使用的开发环境镜像
 
+## 分支
+
+- **main**：amd64 架构
+- **arm**：arm 架构（ Apple silicon 请选择此分支）
+
 ## 特性
 
 - ubuntu 20.04
