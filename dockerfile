@@ -1,3 +1,5 @@
+# 非 arm 平台打 arm 包使用注释的 from
+# FROM arm64v8/ubuntu:20.04
 FROM ubuntu:20.04
 
 LABEL maintainer=yuzheng14
@@ -8,8 +10,7 @@ SHELL ["/bin/bash","-c"]
 WORKDIR /root/code
 
 # 替换 apt 源
-RUN sed -i "s@http://.*archive.ubuntu.com@http://mirrors.tuna.tsinghua.edu.cn@g" /etc/apt/sources.list && \
-  sed -i "s@http://.*security.ubuntu.com@http://mirrors.tuna.tsinghua.edu.cn@g" /etc/apt/sources.list
+RUN sed -i "s@http://ports.ubuntu.com@http://mirrors.tuna.tsinghua.edu.cn@g" /etc/apt/sources.list
 
 # 安装系统证书相关软件
 RUN apt update && \
@@ -32,17 +33,17 @@ RUN echo "export LC_ALL=zh_CN.UTF-8" >> /etc/profile && \
 RUN apt install -y git
 
 # 配置 git 使用的指令
-ARG git_username=''
-ARG git_email=''
+ARG git_username='placeholder'
+ARG git_email='placeholder@placeholder.com'
 
 # 配置 git alias
 RUN git config --global alias.cam "commit -a -m";\
   git config --global alias.cm "commit -m";\
   git config --global alias.pure "pull --rebase";\
   git config --global alias.lg "log --graph --decorate";\
-  git config --global alias.lg1 "log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%Creset' --abbrev-commit --date=relative";\
-  git config --global user.name ${git_username};\
-  git config --global user.email ${git_email}
+  git config --global alias.lg1 "log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%Creset' --abbrev-commit --date=relative"
+RUN git config --global user.name ${git_username}
+RUN git config --global user.email ${git_email}
 
 # 安装 zsh && oh-my-zsh
 RUN apt install -y zsh curl wget && \
